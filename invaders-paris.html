@@ -505,6 +505,159 @@
   }
 
   .hidden-row { display: none; }
+
+  /* ===== MODE BALADE ===== */
+  .mode-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 10px 6px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .mode-tab:hover { color: var(--text); }
+
+  .tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  .tab-content.active { display: flex; }
+
+  /* BALADE PANEL */
+  .balade-controls {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .balade-row { display: flex; gap: 6px; align-items: center; }
+  .balade-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; min-width: 60px; }
+  
+  .range-input {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .range-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .balade-summary {
+    padding: 10px 14px;
+    background: rgba(0,255,136,0.04);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    display: none;
+  }
+  .balade-summary.visible { display: block; }
+  .balade-summary strong { color: var(--accent); }
+
+  .balade-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .balade-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(30,30,46,0.5);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .balade-item:hover { background: rgba(0,255,136,0.04); }
+  .balade-item.current { background: rgba(0,255,136,0.1); border-left: 2px solid var(--accent); }
+  .balade-item.done-step { opacity: 0.4; }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .step-num.current-num { background: var(--accent); color: var(--bg); }
+  .step-num.done-num { background: rgba(0,255,136,0.2); color: var(--accent); }
+
+  .step-info { flex: 1; min-width: 0; }
+  .step-id { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); }
+  .step-dist { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  .balade-actions {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Navigation flottante sur la carte */
+  .nav-overlay {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 14px 20px;
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 30px rgba(0,255,136,0.2);
+    min-width: 280px;
+    max-width: 90vw;
+  }
+  .nav-overlay.visible { display: flex; }
+  .nav-invader-id { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent); }
+  .nav-distance { font-size: 12px; color: var(--muted); }
+  .nav-hint { font-size: 11px; color: #aaa; font-style: italic; }
+  .nav-buttons { display: flex; gap: 8px; margin-top: 4px; }
+  .nav-btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .nav-btn.flash { background: var(--accent3); color: #000; }
+  .nav-btn.skip { background: var(--border); color: var(--text); }
+  .nav-btn.stop { background: var(--accent2); color: #fff; }
+  .nav-progress { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+
+  /* Position marker */
+  .pos-marker {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #4af;
+    border: 3px solid #fff;
+    box-shadow: 0 0 12px #4af;
+  }
+
 </style>
 </head>
 <body>
@@ -542,22 +695,59 @@
 <div class="main">
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sidebar-controls">
-      <input type="text" class="search-box" id="searchInput" placeholder="🔍 Chercher un ID (PA_xxx)…">
-      <div class="filter-row">
-        <button class="toggle-btn active" data-filter="all" onclick="setFilter('all', this)">Tous</button>
-        <button class="toggle-btn" data-filter="ok" onclick="setFilter('ok', this)">✅ OK</button>
-        <button class="toggle-btn yellow" data-filter="damaged" onclick="setFilter('damaged', this)">⚠️ Endommagé</button>
-        <button class="toggle-btn red" data-filter="destroyed" onclick="setFilter('destroyed', this)">💀 Détruit</button>
-        <button class="toggle-btn" data-filter="notflashed" onclick="setFilter('notflashed', this)">🎯 Non flashés</button>
-      </div>
-      <div class="uid-row">
-        <input type="text" class="uid-input" id="uidInput" placeholder="Ton UID Flash Invaders (optionnel)">
-        <button class="btn yellow" onclick="loadFromUID()">Sync</button>
-      </div>
+
+    <!-- TABS -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchTab('liste', this)">🗺 Liste</button>
+      <button class="mode-tab" onclick="switchTab('balade', this)">🚶 Balade</button>
     </div>
-    <div class="section-title" id="listCount">LISTE — 0 invaders</div>
-    <div class="invader-list" id="invaderList"></div>
+
+    <!-- TAB : LISTE -->
+    <div class="tab-content active" id="tab-liste">
+      <div class="sidebar-controls">
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Chercher un ID (PA_xxx)…">
+        <div class="filter-row">
+          <button class="toggle-btn active" data-filter="all" onclick="setFilter('all', this)">Tous</button>
+          <button class="toggle-btn" data-filter="ok" onclick="setFilter('ok', this)">✅ OK</button>
+          <button class="toggle-btn yellow" data-filter="damaged" onclick="setFilter('damaged', this)">⚠️ Endommagé</button>
+          <button class="toggle-btn red" data-filter="destroyed" onclick="setFilter('destroyed', this)">💀 Détruit</button>
+          <button class="toggle-btn" data-filter="notflashed" onclick="setFilter('notflashed', this)">🎯 Non flashés</button>
+        </div>
+        <div class="uid-row">
+          <input type="text" class="uid-input" id="uidInput" placeholder="Ton UID Flash Invaders (optionnel)">
+          <button class="btn yellow" onclick="loadFromUID()">Sync</button>
+        </div>
+      </div>
+      <div class="section-title" id="listCount">LISTE — 0 invaders</div>
+      <div class="invader-list" id="invaderList"></div>
+    </div><!-- end tab-liste -->
+
+    <!-- TAB : BALADE -->
+    <div class="tab-content" id="tab-balade">
+      <div class="balade-controls">
+        <div class="balade-row">
+          <span class="balade-label">Rayon</span>
+          <input type="range" class="range-input" id="baladeRadius" min="300" max="3000" step="100" value="800" oninput="updateBaladeRadius()">
+          <span class="range-value" id="baladeRadiusVal">800m</span>
+        </div>
+        <div class="balade-row">
+          <span class="balade-label">Max stops</span>
+          <input type="range" class="range-input" id="baladeMax" min="3" max="30" step="1" value="10" oninput="updateBaladeMax()">
+          <span class="range-value" id="baladeMaxVal">10</span>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:4px;">
+          <button class="btn" style="flex:1" onclick="planifierBalade()">📍 Depuis ma position</button>
+          <button class="btn gray" onclick="planifierBaladeDepuisCarte()">🗺 Depuis la carte</button>
+        </div>
+      </div>
+      <div class="balade-summary" id="baladeSummary"></div>
+      <div class="balade-list" id="baladeList"></div>
+      <div class="balade-actions" id="baladeActions" style="display:none">
+        <button class="btn" style="background:var(--accent); color:var(--bg);" onclick="startNavigation()">▶ Démarrer la navigation</button>
+        <button class="btn gray" onclick="resetBalade()">✕ Effacer la balade</button>
+      </div>
+    </div><!-- end tab-balade -->
+
     <div class="import-section">
       <span class="import-label">Sauvegarde locale</span>
       <div class="import-row">
@@ -573,6 +763,19 @@
 
   <!-- MAP -->
   <div id="map"></div>
+</div>
+
+<!-- NAV OVERLAY -->
+<div class="nav-overlay" id="navOverlay">
+  <div class="nav-progress" id="navProgress">Étape 1 / 10</div>
+  <div class="nav-invader-id" id="navId">PA_xxx</div>
+  <div class="nav-hint" id="navHint"></div>
+  <div class="nav-distance" id="navDist">📍 Calcul en cours…</div>
+  <div class="nav-buttons">
+    <button class="nav-btn flash" onclick="navFlash()">⭐ Flashé !</button>
+    <button class="nav-btn skip" onclick="navSkip()">⏭ Passer</button>
+    <button class="nav-btn stop" onclick="stopNavigation()">⏹ Stop</button>
+  </div>
 </div>
 
 <!-- INSTAGRAM PANEL -->
@@ -1164,6 +1367,319 @@ function closeIgPanel() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeIgPanel();
 });
+
+
+// ===== BALADE MODE =====
+let baladeRoute = [];       // liste ordonnée d'invaders pour la balade
+let baladeRadius = 800;     // rayon en mètres
+let baladeMax = 10;         // nombre max de stops
+let baladeOrigin = null;    // {lat, lng} point de départ
+let baladeCircle = null;    // cercle Leaflet
+let baladeMarkers = [];     // marqueurs numérotés
+let routePolyline = null;   // trait de l'itinéraire
+
+let navStep = 0;            // étape courante
+let navActive = false;
+let posMarker = null;       // marqueur position GPS
+let watchId = null;         // GPS watch
+
+// Tab switching
+function switchTab(name, btn) {
+  document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function updateBaladeRadius() {
+  baladeRadius = parseInt(document.getElementById('baladeRadius').value);
+  document.getElementById('baladeRadiusVal').textContent = baladeRadius + 'm';
+}
+function updateBaladeMax() {
+  baladeMax = parseInt(document.getElementById('baladeMax').value);
+  document.getElementById('baladeMaxVal').textContent = baladeMax;
+}
+
+// Calcul distance entre deux points GPS (Haversine)
+function distanceM(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function formatDist(m) {
+  return m < 1000 ? Math.round(m) + 'm' : (m/1000).toFixed(1) + 'km';
+}
+
+// Algorithme greedy nearest-neighbor pour optimiser le parcours
+function optimizeRoute(origin, invaders) {
+  const candidates = invaders
+    .filter(inv => !flashed.has(inv.id) && inv.status !== 'destroyed')
+    .filter(inv => distanceM(origin.lat, origin.lng, inv.lat, inv.lng) <= baladeRadius)
+    .slice(0, 80); // limite pour perf
+
+  if (candidates.length === 0) return [];
+
+  // Nearest neighbor greedy
+  const route = [];
+  const remaining = [...candidates];
+  let current = origin;
+
+  while (route.length < baladeMax && remaining.length > 0) {
+    let nearestIdx = 0;
+    let nearestDist = Infinity;
+    remaining.forEach((inv, i) => {
+      const d = distanceM(current.lat, current.lng, inv.lat, inv.lng);
+      if (d < nearestDist) { nearestDist = d; nearestIdx = i; }
+    });
+    const nearest = remaining.splice(nearestIdx, 1)[0];
+    nearest._dist = nearestDist;
+    route.push(nearest);
+    current = { lat: nearest.lat, lng: nearest.lng };
+  }
+  return route;
+}
+
+// Calcule la distance totale d'un parcours
+function totalDistance(origin, route) {
+  let total = 0;
+  let prev = origin;
+  route.forEach(inv => {
+    total += distanceM(prev.lat, prev.lng, inv.lat, inv.lng);
+    prev = inv;
+  });
+  return total;
+}
+
+function clearBaladeMapElements() {
+  if (baladeCircle) { baladeCircle.remove(); baladeCircle = null; }
+  baladeMarkers.forEach(m => m.remove());
+  baladeMarkers = [];
+  if (routePolyline) { routePolyline.remove(); routePolyline = null; }
+}
+
+function drawBalade(origin, route) {
+  clearBaladeMapElements();
+
+  // Cercle de rayon
+  baladeCircle = L.circle([origin.lat, origin.lng], {
+    radius: baladeRadius,
+    color: '#00ff88',
+    fillColor: '#00ff88',
+    fillOpacity: 0.04,
+    weight: 1,
+    dashArray: '6,4'
+  }).addTo(map);
+
+  // Polyline du parcours
+  const points = [[origin.lat, origin.lng], ...route.map(inv => [inv.lat, inv.lng])];
+  routePolyline = L.polyline(points, {
+    color: '#00ff88',
+    weight: 2,
+    opacity: 0.5,
+    dashArray: '8,6'
+  }).addTo(map);
+
+  // Marqueurs numérotés
+  route.forEach((inv, i) => {
+    const icon = L.divIcon({
+      html: `<div style="
+        width:24px; height:24px; border-radius:50%;
+        background: #ffcc00; color:#000;
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+        border:2px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.5);
+      ">${i+1}</div>`,
+      className: '', iconSize: [24,24], iconAnchor: [12,12]
+    });
+    const m = L.marker([inv.lat, inv.lng], { icon }).addTo(map);
+    m.on('click', () => focusInvader(inv.id));
+    baladeMarkers.push(m);
+  });
+
+  // Marqueur point de départ
+  const startIcon = L.divIcon({
+    html: `<div style="
+      width:20px; height:20px; border-radius:50%;
+      background:#4af; border:3px solid #fff;
+      box-shadow:0 0 12px #4af;
+    "></div>`,
+    className: '', iconSize: [20,20], iconAnchor: [10,10]
+  });
+  const sm = L.marker([origin.lat, origin.lng], { icon: startIcon }).addTo(map);
+  baladeMarkers.push(sm);
+
+  // Fit map to route
+  const allPoints = [[origin.lat, origin.lng], ...route.map(i => [i.lat, i.lng])];
+  if (allPoints.length > 1) map.fitBounds(allPoints, { padding: [40,40] });
+}
+
+function renderBaladeList(origin, route) {
+  const list = document.getElementById('baladeList');
+  const summary = document.getElementById('baladeSummary');
+  const actions = document.getElementById('baladeActions');
+
+  if (route.length === 0) {
+    list.innerHTML = `<div style="padding:20px; text-align:center; color:var(--muted); font-size:12px; font-family:'Space Mono',monospace;">
+      Aucun invader non flashé dans ce rayon.<br>Essaie d'augmenter le rayon !
+    </div>`;
+    summary.classList.remove('visible');
+    actions.style.display = 'none';
+    return;
+  }
+
+  const dist = totalDistance(origin, route);
+  const walkMin = Math.round(dist / 80); // ~80m/min à pied
+  summary.innerHTML = `<strong>${route.length} invaders</strong> · ${formatDist(dist)} · ~${walkMin} min à pied`;
+  summary.classList.add('visible');
+  actions.style.display = 'flex';
+
+  list.innerHTML = '';
+  route.forEach((inv, i) => {
+    const div = document.createElement('div');
+    div.className = 'balade-item';
+    div.dataset.id = inv.id;
+    div.innerHTML = `
+      <div class="step-num">${i+1}</div>
+      <div class="step-info">
+        <div class="step-id">${inv.id}</div>
+        <div class="step-dist">${formatDist(inv._dist || 0)} du point précédent${inv.hint ? ' · ' + inv.hint : ''}</div>
+      </div>
+      <button class="flash-toggle ${flashed.has(inv.id) ? 'done' : ''}" onclick="toggleFlash(event, '${inv.id}')">
+        ${flashed.has(inv.id) ? '⭐' : '☆'}
+      </button>
+    `;
+    div.addEventListener('click', () => focusInvader(inv.id));
+    list.appendChild(div);
+  });
+}
+
+function planifierBalade() {
+  if (!navigator.geolocation) { notify('Géolocalisation non disponible', true); return; }
+  notify('📍 Localisation en cours…');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const origin = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    baladeOrigin = origin;
+    const route = optimizeRoute(origin, allInvaders);
+    baladeRoute = route;
+    drawBalade(origin, route);
+    renderBaladeList(origin, route);
+    notify(`✅ ${route.length} invaders trouvés autour de toi !`);
+  }, () => {
+    notify('Impossible de te localiser. Utilise "Depuis la carte".', true);
+  });
+}
+
+function planifierBaladeDepuisCarte() {
+  notify('Clique sur la carte pour choisir ton point de départ');
+  map.once('click', e => {
+    baladeOrigin = { lat: e.latlng.lat, lng: e.latlng.lng };
+    const route = optimizeRoute(baladeOrigin, allInvaders);
+    baladeRoute = route;
+    drawBalade(baladeOrigin, route);
+    renderBaladeList(baladeOrigin, route);
+    notify(`✅ ${route.length} invaders trouvés autour de ce point !`);
+  });
+}
+
+function resetBalade() {
+  clearBaladeMapElements();
+  baladeRoute = [];
+  baladeOrigin = null;
+  document.getElementById('baladeList').innerHTML = '';
+  document.getElementById('baladeSummary').classList.remove('visible');
+  document.getElementById('baladeActions').style.display = 'none';
+  stopNavigation();
+}
+
+// ===== NAVIGATION EN TEMPS RÉEL =====
+function startNavigation() {
+  if (baladeRoute.length === 0) return;
+  navStep = 0;
+  navActive = true;
+  document.getElementById('navOverlay').classList.add('visible');
+  updateNavStep();
+
+  // GPS tracking
+  if (navigator.geolocation) {
+    watchId = navigator.geolocation.watchPosition(pos => {
+      updatePosMarker(pos.coords.latitude, pos.coords.longitude);
+      updateNavDistance(pos.coords.latitude, pos.coords.longitude);
+    }, null, { enableHighAccuracy: true });
+  }
+}
+
+function updateNavStep() {
+  if (navStep >= baladeRoute.length) {
+    stopNavigation();
+    notify('🎉 Balade terminée ! Bien joué !');
+    return;
+  }
+  const inv = baladeRoute[navStep];
+  document.getElementById('navProgress').textContent = `Étape ${navStep+1} / ${baladeRoute.length}`;
+  document.getElementById('navId').textContent = inv.id;
+  document.getElementById('navHint').textContent = inv.hint || '';
+
+  // Highlight current step in list
+  document.querySelectorAll('.balade-item').forEach((el, i) => {
+    el.classList.toggle('current', i === navStep);
+    el.classList.toggle('done-step', i < navStep);
+    const num = el.querySelector('.step-num');
+    if (num) {
+      num.className = 'step-num' + (i === navStep ? ' current-num' : i < navStep ? ' done-num' : '');
+      if (i < navStep) num.textContent = '✓';
+    }
+  });
+
+  // Centre la carte sur l'invader cible
+  map.setView([inv.lat, inv.lng], 17, { animate: true });
+  if (markers[inv.id]) markers[inv.id].openPopup();
+
+  // Scroll list to current step
+  const currentItem = document.querySelector('.balade-item.current');
+  if (currentItem) currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function updateNavDistance(userLat, userLng) {
+  if (navStep >= baladeRoute.length) return;
+  const inv = baladeRoute[navStep];
+  const d = distanceM(userLat, userLng, inv.lat, inv.lng);
+  document.getElementById('navDist').textContent = `📍 ${formatDist(d)} de l'invader`;
+}
+
+function updatePosMarker(lat, lng) {
+  if (!posMarker) {
+    const icon = L.divIcon({
+      html: '<div class="pos-marker"></div>',
+      className: '', iconSize: [16,16], iconAnchor: [8,8]
+    });
+    posMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+  } else {
+    posMarker.setLatLng([lat, lng]);
+  }
+}
+
+function navFlash() {
+  const inv = baladeRoute[navStep];
+  flashed.add(inv.id);
+  saveFlashed();
+  renderAll();
+  navStep++;
+  updateNavStep();
+}
+
+function navSkip() {
+  navStep++;
+  updateNavStep();
+}
+
+function stopNavigation() {
+  navActive = false;
+  document.getElementById('navOverlay').classList.remove('visible');
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+}
 
 // ===== START =====
 init();

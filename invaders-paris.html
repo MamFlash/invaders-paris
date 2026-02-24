@@ -1101,27 +1101,32 @@ function renderMarkers() {
 function showPopup(inv, marker) {
   const isFlashed = flashed.has(inv.id);
 
+  const hasImg = inv.img && imageMap[inv.id];
   const popupContent = `
     <div class="popup-card">
-      <img class="popup-img" 
-        src="${inv.img}" 
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
-        alt="${inv.id}"
-      />
-      <div style="display:none; width:100%; height:80px; background:#1e1e2e; border-radius:6px; margin-bottom:10px; align-items:center; justify-content:center; font-size:32px;">👾</div>
+      ${hasImg ? `
+        <img class="popup-img"
+          src="${inv.img}"
+          onerror="this.style.display='none'"
+          alt="${inv.id}"
+          style="cursor:pointer"
+          onclick="window.open('${inv.instagramUrl || '#'}', '_blank')"
+        />
+      ` : `
+        <div style="width:100%; height:70px; background:#1e1e2e; border-radius:6px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; font-size:28px;">👾</div>
+      `}
       <div class="popup-id">${inv.id}</div>
       <div class="popup-status">${statusLabel(inv.status)}</div>
       ${inv.hint ? `<div style="font-size:11px;color:#aaa;margin-bottom:8px;font-style:italic;">${inv.hint}</div>` : ''}
-      ${inv.instagramUrl ? `<button onclick="openIgPanel('${inv.id}', '${inv.instagramUrl}')" style="
-        width:100%; padding:8px; border-radius:6px; border:1px solid #444;
-        background: rgba(131,58,180,0.15); color:#cc88ff;
-        font-family:'Syne',sans-serif; font-weight:700; font-size:12px;
-        cursor:pointer; margin-bottom:8px; transition:all 0.2s;
-        text-align:center;
-      " onmouseover="this.style.background='rgba(131,58,180,0.3)'" 
-         onmouseout="this.style.background='rgba(131,58,180,0.15)'">
-        📸 Voir les photos
-      </button>` : ''}
+      ${!hasImg && inv.instagramUrl ? `
+        <a href="${inv.instagramUrl}" target="_blank" style="
+          display:block; width:100%; padding:8px; border-radius:6px;
+          border:1px solid #444; background:rgba(131,58,180,0.15);
+          color:#cc88ff; font-family:'Syne',sans-serif; font-weight:700;
+          font-size:12px; margin-bottom:8px; text-align:center;
+          text-decoration:none; transition:all 0.2s;
+        ">📸 Voir sur Instagram</a>
+      ` : ''}
       <button class="popup-flash-btn ${isFlashed ? 'flashed' : ''}" onclick="toggleFlash(event, '${inv.id}')">
         ${isFlashed ? '⭐ Flashé !' : '☆ Marquer comme flashé'}
       </button>

@@ -122,6 +122,7 @@ header {
 .flash-toggle.done { background: rgba(255,204,0,0.15); border-color: var(--accent3); }
 .import-section { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
 .import-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.import-desc { font-size: 10px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
 .import-row { display: flex; gap: 6px; }
 
 /* BALADE TAB */
@@ -197,6 +198,52 @@ header {
 .ig-open-btn { padding: 14px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
 .ig-open-btn a { display: block; text-align: center; padding: 10px; border-radius: 6px; background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); color: #fff; font-weight: 700; font-size: 13px; text-decoration: none; transition: opacity 0.2s; }
 .ig-open-btn a:hover { opacity: 0.85; }
+
+/* WELCOME MODAL */
+.welcome-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 9998; display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.welcome-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 24px; max-width: 420px; width: 100%;
+  font-family: 'Syne', sans-serif;
+}
+.welcome-title {
+  font-size: 26px; font-weight: 800; color: var(--accent);
+  text-shadow: 0 0 20px rgba(0,255,136,0.4); margin-bottom: 6px;
+}
+.welcome-subtitle {
+  font-size: 13px; color: var(--muted); margin-bottom: 20px;
+}
+.welcome-features {
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;
+}
+.welcome-feature {
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.welcome-feature-icon {
+  font-size: 22px; flex-shrink: 0; margin-top: 1px;
+}
+.welcome-feature-text { flex: 1; }
+.welcome-feature-title {
+  font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;
+}
+.welcome-feature-desc {
+  font-size: 11px; color: var(--muted); line-height: 1.5;
+}
+.welcome-btn {
+  width: 100%; padding: 12px; border-radius: 10px; border: none;
+  background: var(--accent); color: var(--bg);
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+}
+.welcome-btn:hover { filter: brightness(1.15); }
+.welcome-footer {
+  text-align: center; font-size: 10px; color: var(--muted);
+  margin-top: 12px; font-family: 'Space Mono', monospace;
+}
 
 /* LOADING */
 .loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
@@ -317,6 +364,46 @@ header {
 <body>
 <div class="app">
 
+<!-- WELCOME MODAL -->
+<div class="welcome-overlay" id="welcomeOverlay" style="display:none">
+  <div class="welcome-card">
+    <div class="welcome-title">👾 Invaders Paris</div>
+    <div class="welcome-subtitle">Ta carte personnelle pour chasser les mosaïques de l'artiste Invader dans Paris</div>
+    <div class="welcome-features">
+      <div class="welcome-feature">
+        <div class="welcome-feature-icon">🗺</div>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">Carte interactive</div>
+          <div class="welcome-feature-desc">1500+ invaders sur la carte. Vert = OK, jaune = endommagé, rouge = détruit. Clique sur un point pour voir les détails.</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <div class="welcome-feature-icon">⭐</div>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">Marquer tes flashs</div>
+          <div class="welcome-feature-desc">Clique sur ☆ pour marquer un invader comme flashé — il se grise sur la carte. Utilise le filtre "🎯 Restants" pour ne voir que ceux qui te manquent.</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <div class="welcome-feature-icon">🚶</div>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">Mode Balade</div>
+          <div class="welcome-feature-desc">L'onglet "Balade" planifie un parcours optimisé autour de ta position, en évitant les invaders déjà flashés.</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <div class="welcome-feature-icon">💾</div>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">Sauvegarder ta progression</div>
+          <div class="welcome-feature-desc">Tes flashs sont sauvegardés dans ce navigateur. Pour les transférer sur un autre appareil, utilise "Sauvegarder" puis "Restaurer".</div>
+        </div>
+      </div>
+    </div>
+    <button class="welcome-btn" onclick="closeWelcome()">C'est parti ! 👾</button>
+    <div class="welcome-footer">Ce message n'apparaîtra plus au prochain lancement</div>
+  </div>
+</div>
+
 <!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-title">👾 INVADERS PARIS</div>
@@ -363,14 +450,15 @@ header {
       <div class="section-title" id="listCount">LISTE — 0 invaders</div>
       <div class="invader-list" id="invaderList"></div>
       <div class="import-section">
-        <span class="import-label">Sauvegarde</span>
+        <span class="import-label">💾 Mes flashs</span>
+        <span class="import-desc">Sauvegarde ta progression pour la transférer sur un autre appareil</span>
         <div class="import-row">
-          <button class="btn gray" style="flex:1" onclick="exportFlashed()">⬇ Export</button>
-          <label class="btn gray" style="flex:1; text-align:center; cursor:pointer">
-            ⬆ Import
+          <button class="btn gray" style="flex:1" onclick="exportFlashed()" title="Télécharge un fichier avec tous tes flashs">⬇ Sauvegarder</button>
+          <label class="btn gray" style="flex:1; text-align:center; cursor:pointer" title="Charge un fichier de flashs précédemment sauvegardé">
+            ⬆ Restaurer
             <input type="file" accept=".json" style="display:none" onchange="importFlashed(event)">
           </label>
-          <button class="btn danger" onclick="resetFlashed()">Reset</button>
+          <button class="btn danger" onclick="resetFlashed()" title="Efface tous tes flashs">🗑</button>
         </div>
       </div>
     </div>
@@ -563,6 +651,7 @@ async function loadData() {
 
   setTimeout(() => {
     document.getElementById('loadingOverlay').style.display = 'none';
+    showWelcomeIfFirstTime();
   }, 400);
 }
 
@@ -1382,6 +1471,18 @@ function bottomNav(tab) {
       setTimeout(() => document.getElementById('searchInput')?.focus(), 400);
     }
   }
+}
+
+// ===== WELCOME =====
+function showWelcomeIfFirstTime() {
+  const seen = localStorage.getItem('welcomeSeen');
+  if (!seen) {
+    document.getElementById('welcomeOverlay').style.display = 'flex';
+  }
+}
+function closeWelcome() {
+  document.getElementById('welcomeOverlay').style.display = 'none';
+  localStorage.setItem('welcomeSeen', '1');
 }
 
 // ===== START =====

@@ -477,8 +477,7 @@ header {
           <span class="range-value" id="baladeMaxVal">10</span>
         </div>
         <div style="display:flex; gap:6px; margin-top:4px;">
-          <button class="btn" style="flex:1; font-size:11px;" onclick="planifierBalade()">📍 Ma position</button>
-          <button class="btn gray" style="flex:1; font-size:11px;" onclick="planifierBaladeDepuisCarte()">🗺 Depuis carte</button>
+          <button class="btn" style="width:100%; font-size:12px;" onclick="planifierBalade()">📍 Planifier autour de ma position</button>
         </div>
       </div>
       <div class="balade-summary" id="baladeSummary"></div>
@@ -1331,17 +1330,7 @@ function planifierBalade() {
   });
 }
 
-function planifierBaladeDepuisCarte() {
-  notify('Clique sur la carte pour choisir ton point de départ');
-  map.once('click', e => {
-    baladeOrigin = { lat: e.latlng.lat, lng: e.latlng.lng };
-    const route = optimizeRoute(baladeOrigin, allInvaders);
-    baladeRoute = route;
-    drawBalade(baladeOrigin, route);
-    renderBaladeList(baladeOrigin, route);
-    notify(`✅ ${route.length} invaders trouvés autour de ce point !`);
-  });
-}
+
 
 function resetBalade() {
   clearBaladeMapElements();

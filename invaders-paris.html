@@ -959,232 +959,104 @@
   }
 
   /* ===== MOBILE ===== */
+
+  /* Bouton menu — caché sur desktop */
+  .mobile-menu-btn { display: none; }
+  /* Barre bottom nav — cachée sur desktop */
+  .bottom-nav { display: none; }
+
   @media (max-width: 768px) {
 
-    header { padding: 8px 12px; }
-    .logo { font-size: 16px; }
-    .stats-bar { gap: 8px; }
+    /* === HEADER === */
+    header { padding: 6px 10px; flex-wrap: wrap; gap: 4px; }
+    .logo { font-size: 14px; order: 1; flex: 1; }
+    .stats-bar {
+      order: 3; width: 100%; margin-left: 0;
+      justify-content: space-around;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
     .stat-value { font-size: 13px; }
-    .stat-label { font-size: 9px; }
+    .stat-label { font-size: 8px; }
 
-    .main { position: relative; overflow: hidden; }
+    /* === LAYOUT === */
+    .main { position: relative; flex: 1; overflow: hidden; }
+    #map { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-    /* Carte prend tout l'écran */
-    #map { width: 100vw; }
-
-    /* Sidebar : tiroir plein écran */
+    /* === SIDEBAR = tiroir qui monte depuis le bas === */
     .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      max-width: 100%;
-      z-index: 3000;
-      transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 4px 0 30px rgba(0,0,0,0.7);
+      position: fixed !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 60px !important;
+      top: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 72vh !important;
+      border-radius: 18px 18px 0 0 !important;
+      border-right: none !important;
+      border-top: 2px solid var(--border) !important;
+      transform: translateY(110%) !important;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+      z-index: 3000 !important;
+      overflow: hidden !important;
+    }
+    .sidebar.open { transform: translateY(0) !important; }
+
+    /* Poignée visuelle */
+    .drag-handle {
+      display: block !important;
+      width: 36px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 10px auto 4px;
+    }
+
+    /* Cacher le bouton X sur mobile */
+    .sidebar-close { display: none !important; }
+
+    /* === BOTTOM NAV === */
+    .bottom-nav {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 0 !important; left: 0 !important; right: 0 !important;
+      height: 60px !important;
+      background: var(--panel) !important;
+      border-top: 1px solid var(--border) !important;
+      z-index: 4000 !important;
+      align-items: stretch !important;
+    }
+    .bottom-nav-btn {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.2s;
     }
-    .sidebar.open { transform: translateX(0); }
+    .bottom-nav-btn .nav-icon { font-size: 19px; line-height: 1; }
+    .bottom-nav-btn.active { color: var(--accent); }
 
-    /* Les tab-content doivent aussi défiler */
-    .tab-content { overflow: hidden; }
-    .invader-list { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-    .balade-list  { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    /* === OVERLAY NAV balade === */
+    .nav-overlay { bottom: 70px; left: 10px; right: 10px; transform: none; min-width: unset; }
 
-    /* Backdrop */
-    .sidebar-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 2999;
-    }
-    .sidebar-backdrop.visible { display: block; }
+    /* === INSTAGRAM PANEL === */
+    .ig-panel { width: 100%; bottom: 60px; }
 
-    /* Bouton menu visible sur mobile */
-    .mobile-menu-btn { display: flex; }
-
-    /* Bouton fermer visible sur mobile */
-    .sidebar-close { display: flex; }
-    .mode-tabs { padding-right: 44px; }
-
-    /* Panel Instagram full width */
-    .ig-panel { width: 100vw; }
-
-    /* Nav overlay adapté mobile */
-    .nav-overlay {
-      bottom: 16px;
-      left: 12px;
-      right: 12px;
-      transform: none;
-      min-width: unset;
-    }
-
-    /* Import section lisible */
-    .import-section { padding: 10px 12px; }
-    .btn { font-size: 11px; padding: 7px 8px; }
-
-    /* Sidebar controls padding */
-    .sidebar-controls { padding: 12px 12px; }
-    .filter-row { flex-wrap: wrap; }
-    .toggle-btn { font-size: 9px; padding: 4px 7px; }
-  }
-
-
-  /* ===== MODE BALADE ===== */
-  .mode-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .mode-tab {
-    flex: 1;
-    padding: 10px 6px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-  }
-  .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .mode-tab:hover { color: var(--text); }
-
-  .tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
-  .tab-content.active { display: flex; }
-
-  /* BALADE PANEL */
-  .balade-controls {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .balade-row { display: flex; gap: 6px; align-items: center; }
-  .balade-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; min-width: 60px; }
-  
-  .range-input {
-    flex: 1;
-    accent-color: var(--accent);
-    cursor: pointer;
-  }
-  .range-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    min-width: 40px;
-    text-align: right;
-  }
-
-  .balade-summary {
-    padding: 10px 14px;
-    background: rgba(0,255,136,0.04);
-    border-bottom: 1px solid var(--border);
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    display: none;
-  }
-  .balade-summary.visible { display: block; }
-  .balade-summary strong { color: var(--accent); }
-
-  .balade-list {
-    flex: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-
-  .balade-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-bottom: 1px solid rgba(30,30,46,0.5);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .balade-item:hover { background: rgba(0,255,136,0.04); }
-  .balade-item.current { background: rgba(0,255,136,0.1); border-left: 2px solid var(--accent); }
-  .balade-item.done-step { opacity: 0.4; }
-
-  .step-num {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--muted);
-    flex-shrink: 0;
-  }
-  .step-num.current-num { background: var(--accent); color: var(--bg); }
-  .step-num.done-num { background: rgba(0,255,136,0.2); color: var(--accent); }
-
-  .step-info { flex: 1; min-width: 0; }
-  .step-id { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent); }
-  .step-dist { font-size: 10px; color: var(--muted); margin-top: 1px; }
-
-  .balade-actions {
-    padding: 12px 14px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  /* Navigation flottante sur la carte */
-  .nav-overlay {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--panel);
-    border: 1px solid var(--accent);
-    border-radius: 16px;
-    padding: 14px 20px;
-    z-index: 2000;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 8px 30px rgba(0,255,136,0.2);
-    min-width: 280px;
-    max-width: 90vw;
-  }
-  .nav-overlay.visible { display: flex; }
-  .nav-invader-id { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent); }
-  .nav-distance { font-size: 12px; color: var(--muted); }
-  .nav-hint { font-size: 11px; color: #aaa; font-style: italic; }
-  .nav-buttons { display: flex; gap: 8px; margin-top: 4px; }
-  .nav-btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-  .nav-btn.flash { background: var(--accent3); color: #000; }
-  .nav-btn.skip { background: var(--border); color: var(--text); }
-  .nav-btn.stop { background: var(--accent2); color: #fff; }
-  .nav-progress { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
-
-  /* Position marker */
-  .pos-marker {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: #4af;
-    border: 3px solid #fff;
-    box-shadow: 0 0 12px #4af;
+    /* === POPUP plus compacte === */
+    .leaflet-popup-content { margin: 10px !important; }
+    .popup-img { height: 120px; }
   }
 
 </style>
@@ -1229,7 +1101,9 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
 
-    <!-- Bouton fermer sur mobile -->
+    <!-- Poignée mobile -->
+    <div class="drag-handle" style="display:none"></div>
+    <!-- Bouton fermer sur desktop -->
     <button class="sidebar-close" onclick="closeSidebar()">✕</button>
 
     <!-- TABS -->
@@ -2480,55 +2354,51 @@ function isMobile() { return window.innerWidth <= 768; }
 
 function openSidebar() {
   document.querySelector('.sidebar').classList.add('open');
-  document.getElementById('sidebarBackdrop').classList.add('visible');
+  const bd = document.getElementById('sidebarBackdrop');
+  if (bd) { bd.style.display = 'block'; bd.classList.add('visible'); }
 }
+
 function closeSidebar() {
   document.querySelector('.sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('visible');
-  // Reset all bottom nav buttons except map
-  if (isMobile()) {
-    document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('bnMap').classList.add('active');
-  }
+  const bd = document.getElementById('sidebarBackdrop');
+  if (bd) { bd.style.display = 'none'; bd.classList.remove('visible'); }
+  document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+  const mapBtn = document.getElementById('bnMap');
+  if (mapBtn) mapBtn.classList.add('active');
 }
 
-// Bottom nav handler
 function bottomNav(tab) {
-  if (!isMobile()) return;
-
-  // Update active button
+  // Active le bon bouton
   document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('bn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  const btnId = 'bn' + tab.charAt(0).toUpperCase() + tab.slice(1);
+  const activeBtn = document.getElementById(btnId);
+  if (activeBtn) activeBtn.classList.add('active');
 
   if (tab === 'map') {
     closeSidebar();
     return;
   }
 
-  // Open sidebar and switch to correct tab
+  // Ouvre le tiroir
   openSidebar();
 
   if (tab === 'search') {
-    // Switch to liste tab and focus search
-    switchTab('liste', document.querySelector('.mode-tab'));
-    setTimeout(() => document.getElementById('searchInput').focus(), 300);
+    const firstTab = document.querySelector('.mode-tab');
+    switchTab('liste', firstTab);
+    setTimeout(() => {
+      const input = document.getElementById('searchInput');
+      if (input) input.focus();
+    }, 400);
   } else if (tab === 'balade') {
-    // Switch to balade tab
     const tabs = document.querySelectorAll('.mode-tab');
-    switchTab('balade', tabs[1]);
+    if (tabs[1]) switchTab('balade', tabs[1]);
   } else if (tab === 'flash') {
-    // Switch to liste tab with notflashed filter
-    switchTab('liste', document.querySelector('.mode-tab'));
+    const firstTab = document.querySelector('.mode-tab');
+    switchTab('liste', firstTab);
     const btn = document.querySelector('[data-filter="notflashed"]');
     if (btn) setFilter('notflashed', btn);
   }
 }
-
-// Close sidebar when tapping backdrop
-document.addEventListener('DOMContentLoaded', () => {
-  const backdrop = document.getElementById('sidebarBackdrop');
-  if (backdrop) backdrop.addEventListener('click', closeSidebar);
-});
 
 // ===== START =====
 init();

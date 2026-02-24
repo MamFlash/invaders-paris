@@ -506,62 +506,421 @@
 
   .hidden-row { display: none; }
 
-  /* ===== MOBILE ===== */
+  /* ===== BOTTOM NAV MOBILE ===== */
+  .bottom-nav {
+    display: none;
+  }
+
   @media (max-width: 768px) {
 
+    /* Header simplifié sur mobile */
     header {
       padding: 8px 12px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
-    .logo { font-size: 16px; }
-    .stats-bar { gap: 10px; }
-    .stat-value { font-size: 13px; }
+    .logo { font-size: 15px; order: 1; }
+    .stats-bar { 
+      order: 3; 
+      width: 100%; 
+      justify-content: space-around;
+      margin-left: 0;
+      padding: 4px 0 2px;
+      border-top: 1px solid var(--border);
+    }
+    .stat-value { font-size: 14px; }
     .stat-label { font-size: 9px; }
+    .mobile-menu-btn { display: none !important; } /* on utilise la bottom nav */
 
-    .main { position: relative; }
+    /* Carte prend tout l'espace sauf header + bottom nav */
+    .main { 
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    #map { 
+      position: absolute;
+      inset: 0;
+    }
 
-    /* Sidebar cachée par défaut sur mobile */
+    /* Sidebar en drawer depuis le bas */
     .sidebar {
       position: fixed;
-      left: 0; top: 0; bottom: 0;
+      left: 0;
+      right: 0;
+      bottom: 60px; /* au dessus de la bottom nav */
+      top: auto;
       width: 100%;
-      max-width: 360px;
-      z-index: 3000;
-      transform: translateX(-100%);
+      max-width: 100%;
+      height: 70vh;
+      border-radius: 20px 20px 0 0;
+      border-right: none;
+      border-top: 1px solid var(--border);
+      transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 4px 0 30px rgba(0,0,0,0.7);
+      z-index: 3000;
     }
-    .sidebar.open { transform: translateX(0); }
+    .sidebar.open { transform: translateY(0); }
 
-    /* Overlay sombre derrière la sidebar */
-    .sidebar-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 2999;
+    /* Poignée en haut du drawer */
+    .sidebar::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 10px auto 6px;
+      flex-shrink: 0;
     }
-    .sidebar-backdrop.visible { display: block; }
 
-    /* Carte prend tout l'écran */
-    #map { width: 100%; }
+    .sidebar-close { display: none !important; } /* remplacé par la poignée */
 
-    /* Bouton flottant pour ouvrir la sidebar */
-    .mobile-menu-btn {
+    /* Bottom nav */
+    .bottom-nav {
       display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      z-index: 4000;
+      align-items: stretch;
     }
 
-    /* Panel Instagram full width sur mobile */
-    .ig-panel { width: 100%; }
+    .bottom-nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bottom-nav-btn .nav-icon { font-size: 20px; }
+    .bottom-nav-btn.active { color: var(--accent); }
+    .bottom-nav-btn:active { background: rgba(255,255,255,0.05); }
 
-    /* Nav overlay plus grand sur mobile */
+    /* Nav overlay au dessus de la bottom nav */
     .nav-overlay {
-      bottom: 16px;
-      left: 12px;
-      right: 12px;
-      transform: none;
-      min-width: unset;
+      bottom: 70px;
+    }
+
+    /* Panel Instagram full width */
+    .ig-panel { 
+      width: 100%;
+      bottom: 60px;
     }
   }
+
+
+  /* ===== BARRE DE NAV MOBILE EN BAS ===== */
+  .mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    z-index: 3000;
+    height: 60px;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .mobile-nav-btn .icon { font-size: 20px; }
+  .mobile-nav-btn.active { color: var(--accent); }
+  .mobile-nav-btn:hover { color: var(--text); }
+
+  @media (max-width: 768px) {
+    /* Affiche la barre du bas */
+    .mobile-bottom-nav { display: flex; }
+
+    /* Cache le bouton hamburger dans le header */
+    .mobile-menu-btn { display: none; }
+
+    /* Header simplifié — juste logo + stats */
+    header {
+      padding: 6px 10px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .logo { font-size: 14px; }
+    .stats-bar { gap: 8px; margin-left: auto; }
+    .stat-value { font-size: 12px; }
+    .stat-label { font-size: 8px; }
+
+    /* Décale la carte pour la barre du bas */
+    #map { margin-bottom: 60px; }
+
+    /* Panneau plein écran sur mobile */
+    .mobile-panel {
+      position: fixed;
+      inset: 0;
+      bottom: 60px;
+      background: var(--panel);
+      z-index: 2500;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .mobile-panel.open { display: flex; }
+
+    /* Sidebar desktop cachée sur mobile */
+    .sidebar { display: none !important; }
+
+    /* Nav overlay remonté au dessus de la barre */
+    .nav-overlay { bottom: 76px; }
+  }
+
+
+  /* ===== BOTTOM NAV MOBILE ===== */
+  .bottom-nav {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+
+    /* Header simplifié */
+    header {
+      padding: 6px 10px;
+      gap: 8px;
+    }
+    .logo { font-size: 14px; }
+    .mobile-menu-btn { display: none; } /* on n'utilise plus ce bouton */
+    .stats-bar {
+      gap: 8px;
+      font-size: 10px;
+    }
+    .stat-value { font-size: 12px; }
+    .stat-label { font-size: 8px; }
+
+    /* Carte prend tout sauf header + bottom nav */
+    .main {
+      flex-direction: column;
+    }
+    #map {
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Sidebar : panneau qui glisse depuis le bas */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 56px; /* au-dessus de la bottom nav */
+      top: auto;
+      width: 100%;
+      max-width: 100%;
+      height: 65vh;
+      border-right: none;
+      border-top: 2px solid var(--accent);
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      z-index: 3000;
+    }
+    .sidebar.open {
+      transform: translateY(0);
+    }
+    .sidebar-close {
+      display: flex;
+      top: 12px;
+      right: 12px;
+    }
+
+    /* Barre de navigation en bas */
+    .bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      z-index: 4000;
+    }
+    .bottom-nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .bottom-nav-btn .nav-icon { font-size: 20px; }
+    .bottom-nav-btn.active { color: var(--accent); }
+    .bottom-nav-btn:active { opacity: 0.7; }
+
+    /* Popup plus large sur mobile */
+    .leaflet-popup-content-wrapper {
+      max-width: 260px !important;
+    }
+
+    /* Nav overlay full width sur mobile */
+    .nav-overlay {
+      bottom: 64px;
+      left: 8px;
+      right: 8px;
+      transform: none;
+      min-width: unset;
+      max-width: unset;
+    }
+
+    /* Instagram panel full screen sur mobile */
+    .ig-panel {
+      width: 100%;
+      bottom: 56px;
+    }
+  }
+
+
+  /* ===== BOUTONS FLOTTANTS MOBILE (FAB) ===== */
+  @media (max-width: 768px) {
+
+    /* Barre de boutons flottants en bas */
+    .mobile-fab-bar {
+      display: flex;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      gap: 10px;
+      z-index: 2500;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+
+    .fab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 20px;
+      transition: all 0.2s;
+      min-width: 52px;
+    }
+    .fab-btn .fab-icon { font-size: 20px; line-height: 1; }
+    .fab-btn.active { color: var(--accent); background: rgba(0,255,136,0.1); }
+    .fab-btn:active { transform: scale(0.92); }
+
+    /* Panneau recherche mobile */
+    .mobile-search-panel {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 10px;
+      right: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      z-index: 2500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      gap: 8px;
+      flex-direction: column;
+    }
+    .mobile-search-panel.open { display: flex; }
+
+    /* Panneau balade mobile */
+    .mobile-balade-panel {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      left: 10px;
+      right: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      z-index: 2500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      flex-direction: column;
+      max-height: 70vh;
+      overflow: hidden;
+    }
+    .mobile-balade-panel.open { display: flex; }
+
+    .mobile-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .mobile-panel-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    /* Stats mobiles compactes */
+    .stats-bar .stat-label { display: none; }
+    .stats-bar { gap: 8px; }
+
+    /* Cache la nav overlay quand balade panel est open */
+    .nav-overlay { bottom: 90px; }
+  }
+
+  /* Cache la FAB bar sur desktop */
+  .mobile-fab-bar { display: none; }
+
 
   /* Bouton menu mobile — caché sur desktop */
   .mobile-menu-btn {
@@ -597,9 +956,81 @@
     justify-content: center;
     z-index: 10;
   }
+
+  /* ===== MOBILE ===== */
   @media (max-width: 768px) {
+
+    header { padding: 8px 12px; }
+    .logo { font-size: 16px; }
+    .stats-bar { gap: 8px; }
+    .stat-value { font-size: 13px; }
+    .stat-label { font-size: 9px; }
+
+    .main { position: relative; overflow: hidden; }
+
+    /* Carte prend tout l'écran */
+    #map { width: 100vw; }
+
+    /* Sidebar : tiroir plein écran */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      z-index: 3000;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 4px 0 30px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    /* Les tab-content doivent aussi défiler */
+    .tab-content { overflow: hidden; }
+    .invader-list { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .balade-list  { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Backdrop */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2999;
+    }
+    .sidebar-backdrop.visible { display: block; }
+
+    /* Bouton menu visible sur mobile */
+    .mobile-menu-btn { display: flex; }
+
+    /* Bouton fermer visible sur mobile */
     .sidebar-close { display: flex; }
-    .mode-tabs { padding-right: 40px; }
+    .mode-tabs { padding-right: 44px; }
+
+    /* Panel Instagram full width */
+    .ig-panel { width: 100vw; }
+
+    /* Nav overlay adapté mobile */
+    .nav-overlay {
+      bottom: 16px;
+      left: 12px;
+      right: 12px;
+      transform: none;
+      min-width: unset;
+    }
+
+    /* Import section lisible */
+    .import-section { padding: 10px 12px; }
+    .btn { font-size: 11px; padding: 7px 8px; }
+
+    /* Sidebar controls padding */
+    .sidebar-controls { padding: 12px 12px; }
+    .filter-row { flex-wrap: wrap; }
+    .toggle-btn { font-size: 9px; padding: 4px 7px; }
   }
 
 
@@ -868,6 +1299,85 @@
   <!-- MAP -->
   <div id="map"></div>
 </div>
+
+
+<!-- MOBILE SEARCH PANEL -->
+<div class="mobile-search-panel" id="mobileSearchPanel">
+  <input type="text" class="search-box" id="mobileSearchInput" placeholder="🔍 Chercher un ID (PA_xxx)…">
+  <div class="filter-row">
+    <button class="toggle-btn active" onclick="setMobileFilter('all', this)">Tous</button>
+    <button class="toggle-btn" onclick="setMobileFilter('ok', this)">✅ OK</button>
+    <button class="toggle-btn yellow" onclick="setMobileFilter('damaged', this)">⚠️</button>
+    <button class="toggle-btn red" onclick="setMobileFilter('destroyed', this)">💀</button>
+    <button class="toggle-btn" onclick="setMobileFilter('notflashed', this)">🎯 Restants</button>
+  </div>
+  <div id="mobileResultList" style="max-height:200px; overflow-y:auto; margin-top:4px;"></div>
+</div>
+
+<!-- MOBILE BALADE PANEL -->
+<div class="mobile-balade-panel" id="mobileBaladePanel">
+  <div class="mobile-panel-header">
+    <span>🚶 Planifier une balade</span>
+    <button class="mobile-panel-close" onclick="closeMobileBalade()">✕</button>
+  </div>
+  <div style="padding:12px; display:flex; flex-direction:column; gap:10px; flex-shrink:0; border-bottom:1px solid var(--border);">
+    <div class="balade-row">
+      <span class="balade-label">Rayon</span>
+      <input type="range" class="range-input" id="mobileBaladeRadius" min="300" max="3000" step="100" value="800" oninput="updateMobileRadius()">
+      <span class="range-value" id="mobileRadiusVal">800m</span>
+    </div>
+    <div class="balade-row">
+      <span class="balade-label">Stops</span>
+      <input type="range" class="range-input" id="mobileBaladeMax" min="3" max="30" step="1" value="10" oninput="updateMobileMax()">
+      <span class="range-value" id="mobileMaxVal">10</span>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn" style="flex:1; font-size:12px;" onclick="mobilePlanifierPosition()">📍 Ma position</button>
+      <button class="btn gray" style="flex:1; font-size:12px;" onclick="mobilePlanifierCarte()">🗺 Depuis carte</button>
+    </div>
+  </div>
+  <div class="balade-summary" id="mobileBaladeSummary" style="display:none; padding:10px 14px; font-family:'Space Mono',monospace; font-size:11px; color:var(--muted); border-bottom:1px solid var(--border); flex-shrink:0;"></div>
+  <div id="mobileBaladeList" style="flex:1; overflow-y:auto; max-height:200px;"></div>
+  <div id="mobileBaladeActions" style="display:none; padding:10px 12px; border-top:1px solid var(--border); flex-shrink:0;">
+    <button class="btn" style="width:100%; background:var(--accent); color:var(--bg);" onclick="startNavigation(); closeMobileBalade();">▶ Démarrer la navigation</button>
+  </div>
+</div>
+
+<!-- MOBILE FAB BAR -->
+<div class="mobile-fab-bar">
+  <button class="fab-btn" id="fabSearch" onclick="toggleMobileSearch()">
+    <span class="fab-icon">🔍</span>
+    Chercher
+  </button>
+  <button class="fab-btn" id="fabBalade" onclick="toggleMobileBalade()">
+    <span class="fab-icon">🚶</span>
+    Balade
+  </button>
+  <button class="fab-btn" id="fabPosition" onclick="centerOnPosition()">
+    <span class="fab-icon">📍</span>
+    Moi
+  </button>
+  <button class="fab-btn" id="fabMenu" onclick="openSidebar()">
+    <span class="fab-icon">☰</span>
+    Menu
+  </button>
+</div>
+
+<!-- BOTTOM NAV (mobile only) -->
+<nav class="bottom-nav">
+  <button class="bottom-nav-btn active" id="bnMap" onclick="bottomNav('map')">
+    <span class="nav-icon">🗺</span>Carte
+  </button>
+  <button class="bottom-nav-btn" id="bnSearch" onclick="bottomNav('search')">
+    <span class="nav-icon">🔍</span>Recherche
+  </button>
+  <button class="bottom-nav-btn" id="bnBalade" onclick="bottomNav('balade')">
+    <span class="nav-icon">🚶</span>Balade
+  </button>
+  <button class="bottom-nav-btn" id="bnFlash" onclick="bottomNav('flash')">
+    <span class="nav-icon">⭐</span>Mes flashs
+  </button>
+</nav>
 
 <!-- NAV OVERLAY -->
 <div class="nav-overlay" id="navOverlay">
@@ -1793,7 +2303,180 @@ function stopNavigation() {
   if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
 }
 
+
+// ===== MOBILE PANELS =====
+
+let mobileSearchOpen = false;
+let mobileBaladeOpen = false;
+let mobileFilterCurrent = 'all';
+
+function toggleMobileSearch() {
+  mobileSearchOpen = !mobileSearchOpen;
+  mobileBaladeOpen = false;
+  document.getElementById('mobileSearchPanel').classList.toggle('open', mobileSearchOpen);
+  document.getElementById('mobileBaladePanel').classList.remove('open');
+  document.getElementById('fabSearch').classList.toggle('active', mobileSearchOpen);
+  document.getElementById('fabBalade').classList.remove('active');
+  if (mobileSearchOpen) document.getElementById('mobileSearchInput').focus();
+}
+
+function toggleMobileBalade() {
+  mobileBaladeOpen = !mobileBaladeOpen;
+  mobileSearchOpen = false;
+  document.getElementById('mobileBaladePanel').classList.toggle('open', mobileBaladeOpen);
+  document.getElementById('mobileSearchPanel').classList.remove('open');
+  document.getElementById('fabBalade').classList.toggle('active', mobileBaladeOpen);
+  document.getElementById('fabSearch').classList.remove('active');
+}
+
+function closeMobileBalade() {
+  mobileBaladeOpen = false;
+  document.getElementById('mobileBaladePanel').classList.remove('open');
+  document.getElementById('fabBalade').classList.remove('active');
+}
+
+function centerOnPosition() {
+  if (!navigator.geolocation) { notify('Géolocalisation non disponible', true); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    map.setView([pos.coords.latitude, pos.coords.longitude], 16, { animate: true });
+    updatePosMarker(pos.coords.latitude, pos.coords.longitude);
+  }, () => notify('Impossible de te localiser', true));
+}
+
+function setMobileFilter(f, btn) {
+  mobileFilterCurrent = f;
+  document.querySelectorAll('#mobileSearchPanel .toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMobileResults();
+}
+
+function renderMobileResults() {
+  const term = document.getElementById('mobileSearchInput').value.toLowerCase();
+  const list = document.getElementById('mobileResultList');
+  if (!term && mobileFilterCurrent === 'all') { list.innerHTML = ''; return; }
+
+  let results = allInvaders.filter(inv => inv.id.startsWith('PA_'));
+  if (term) results = results.filter(inv => inv.id.toLowerCase().includes(term));
+  if (mobileFilterCurrent === 'ok') results = results.filter(inv => inv.status === 'ok');
+  else if (mobileFilterCurrent === 'damaged') results = results.filter(inv => inv.status === 'damaged');
+  else if (mobileFilterCurrent === 'destroyed') results = results.filter(inv => inv.status === 'destroyed');
+  else if (mobileFilterCurrent === 'notflashed') results = results.filter(inv => !flashed.has(inv.id));
+
+  results = results.slice(0, 30);
+  list.innerHTML = results.map(inv => `
+    <div onclick="focusInvader('${inv.id}'); toggleMobileSearch();" style="
+      padding:8px 4px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:8px; cursor:pointer;
+    ">
+      <span style="font-size:14px;">${statusEmoji(inv.status)}</span>
+      <span style="font-family:'Space Mono',monospace; font-size:12px; color:var(--accent);">${inv.id}</span>
+      ${inv.hint ? `<span style="font-size:10px; color:var(--muted); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${inv.hint}</span>` : ''}
+      ${flashed.has(inv.id) ? '<span style="font-size:12px;">⭐</span>' : ''}
+    </div>
+  `).join('');
+}
+
+document.getElementById('mobileSearchInput').addEventListener('input', renderMobileResults);
+
+// Mobile balade controls
+function updateMobileRadius() {
+  baladeRadius = parseInt(document.getElementById('mobileBaladeRadius').value);
+  document.getElementById('mobileRadiusVal').textContent = baladeRadius + 'm';
+  // Sync desktop slider
+  const desk = document.getElementById('baladeRadius');
+  if (desk) { desk.value = baladeRadius; document.getElementById('baladeRadiusVal').textContent = baladeRadius + 'm'; }
+}
+function updateMobileMax() {
+  baladeMax = parseInt(document.getElementById('mobileBaladeMax').value);
+  document.getElementById('mobileMaxVal').textContent = baladeMax;
+  const desk = document.getElementById('baladeMax');
+  if (desk) { desk.value = baladeMax; document.getElementById('baladeMaxVal').textContent = baladeMax; }
+}
+
+function renderMobileBaladeList(origin, route) {
+  const list = document.getElementById('mobileBaladeList');
+  const summary = document.getElementById('mobileBaladeSummary');
+  const actions = document.getElementById('mobileBaladeActions');
+
+  if (route.length === 0) {
+    list.innerHTML = `<div style="padding:16px; text-align:center; color:var(--muted); font-size:12px; font-family:'Space Mono',monospace;">
+      Aucun invader non flashé dans ce rayon.<br>Essaie d'augmenter le rayon !
+    </div>`;
+    summary.style.display = 'none';
+    actions.style.display = 'none';
+    return;
+  }
+
+  const dist = totalDistance(origin, route);
+  const walkMin = Math.round(dist / 80);
+  summary.textContent = `${route.length} invaders · ${formatDist(dist)} · ~${walkMin} min`;
+  summary.style.display = 'block';
+  actions.style.display = 'block';
+
+  list.innerHTML = route.map((inv, i) => `
+    <div onclick="focusInvader('${inv.id}')" style="
+      display:flex; align-items:center; gap:8px;
+      padding:9px 14px; border-bottom:1px solid rgba(30,30,46,0.5); cursor:pointer;
+    ">
+      <div style="
+        width:22px; height:22px; border-radius:50%;
+        background:#ffcc00; color:#000;
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+        flex-shrink:0;
+      ">${i+1}</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--accent);">${inv.id}</div>
+        <div style="font-size:10px; color:var(--muted);">${formatDist(inv._dist || 0)}${inv.hint ? ' · ' + inv.hint : ''}</div>
+      </div>
+      <button onclick="event.stopPropagation(); toggleFlash(event, '${inv.id}')" style="
+        background:none; border:1px solid var(--border); border-radius:50%;
+        width:26px; height:26px; cursor:pointer; font-size:13px;
+        display:flex; align-items:center; justify-content:center;
+      ">${flashed.has(inv.id) ? '⭐' : '☆'}</button>
+    </div>
+  `).join('');
+}
+
+function mobilePlanifierPosition() {
+  if (!navigator.geolocation) { notify('Géolocalisation non disponible', true); return; }
+  notify('📍 Localisation en cours…');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const origin = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    baladeOrigin = origin;
+    const route = optimizeRoute(origin, allInvaders);
+    baladeRoute = route;
+    drawBalade(origin, route);
+    renderBaladeList(origin, route);       // desktop
+    renderMobileBaladeList(origin, route); // mobile
+    notify(`✅ ${route.length} invaders trouvés !`);
+  }, () => notify('Impossible de te localiser', true));
+}
+
+function mobilePlanifierCarte() {
+  closeMobileBalade();
+  notify('Clique sur la carte pour choisir ton point de départ');
+  map.once('click', e => {
+    const origin = { lat: e.latlng.lat, lng: e.latlng.lng };
+    baladeOrigin = origin;
+    const route = optimizeRoute(origin, allInvaders);
+    baladeRoute = route;
+    drawBalade(origin, route);
+    renderBaladeList(origin, route);
+    renderMobileBaladeList(origin, route);
+    toggleMobileBalade();
+    notify(`✅ ${route.length} invaders trouvés !`);
+  });
+}
+
+// Fermer les panneaux mobiles si on clique sur la carte
+document.getElementById('map').addEventListener('click', () => {
+  if (mobileSearchOpen) toggleMobileSearch();
+});
+
 // ===== MOBILE =====
+function isMobile() { return window.innerWidth <= 768; }
+
 function openSidebar() {
   document.querySelector('.sidebar').classList.add('open');
   document.getElementById('sidebarBackdrop').classList.add('visible');
@@ -1801,8 +2484,50 @@ function openSidebar() {
 function closeSidebar() {
   document.querySelector('.sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('visible');
+  // Reset all bottom nav buttons except map
+  if (isMobile()) {
+    document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('bnMap').classList.add('active');
+  }
 }
-function isMobile() { return window.innerWidth <= 768; }
+
+// Bottom nav handler
+function bottomNav(tab) {
+  if (!isMobile()) return;
+
+  // Update active button
+  document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('bn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+  if (tab === 'map') {
+    closeSidebar();
+    return;
+  }
+
+  // Open sidebar and switch to correct tab
+  openSidebar();
+
+  if (tab === 'search') {
+    // Switch to liste tab and focus search
+    switchTab('liste', document.querySelector('.mode-tab'));
+    setTimeout(() => document.getElementById('searchInput').focus(), 300);
+  } else if (tab === 'balade') {
+    // Switch to balade tab
+    const tabs = document.querySelectorAll('.mode-tab');
+    switchTab('balade', tabs[1]);
+  } else if (tab === 'flash') {
+    // Switch to liste tab with notflashed filter
+    switchTab('liste', document.querySelector('.mode-tab'));
+    const btn = document.querySelector('[data-filter="notflashed"]');
+    if (btn) setFilter('notflashed', btn);
+  }
+}
+
+// Close sidebar when tapping backdrop
+document.addEventListener('DOMContentLoaded', () => {
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+});
 
 // ===== START =====
 init();

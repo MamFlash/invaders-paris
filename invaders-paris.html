@@ -1514,7 +1514,7 @@ function showResetBtn() {
 // ===== GÉOLOCALISATION =====
 function requestGeolocation(callback) {
   if (!navigator.geolocation) {
-    notify('La géolocalisation n'est pas disponible sur ce navigateur', true);
+    notify('La géolocalisation nest pas disponible sur ce navigateur', true);
     return;
   }
   navigator.geolocation.getCurrentPosition(

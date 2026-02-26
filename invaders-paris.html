@@ -1523,7 +1523,7 @@ function requestGeolocation(callback) {
       let msg = '';
       if (err.code === 1) {
         // Permission refusée
-        msg = "Géolocalisation refusée. Pour l'activer sur iPhone : Réglages → Safari → Localisation → Autoriser";
+        msg = "Geolocalisation refusee. Pour activer sur iPhone : Reglages > Safari > Localisation > Autoriser";
         showGeoHelp();
       } else if (err.code === 2) {
         msg = "Position introuvable. Vérifie que le GPS est activé.";

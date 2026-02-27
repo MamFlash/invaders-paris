@@ -825,7 +825,7 @@ function renderMarkers() {
   Object.values(markers).forEach(m => m.remove());
   markers = {};
 
-  const filtered = getFiltered();
+  const filtered = getFiltered(true); // La carte affiche toujours tous les marqueurs
   filtered.forEach(inv => {
     const isFlashed = flashed.has(inv.id);
     const color = isFlashed ? '#aaaacc' :
@@ -958,10 +958,11 @@ function pulseMarker(id) {
 }
 
 // ===== FILTERING =====
-function getFiltered() {
+function getFiltered(ignoreSearch = false) {
   let list = allInvaders.filter(inv => inv.city === 'Paris' || inv.city === 'paris' || !inv.city);
   
-  if (searchTerm) {
+  // La recherche texte filtre UNIQUEMENT la liste, pas les marqueurs sur la carte
+  if (searchTerm && !ignoreSearch) {
     list = list.filter(inv => inv.id.toLowerCase().includes(searchTerm));
   }
 

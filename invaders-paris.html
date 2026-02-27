@@ -512,23 +512,7 @@ header {
 <!-- BACKDROP -->
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-<!-- BOUTON VUE GLOBALE -->
-<button id="resetViewBtn" onclick="resetMapView()" style="
-  position: fixed;
-  top: 70px; left: 10px;
-  z-index: 1500;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'Syne', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 7px 10px;
-  cursor: pointer;
-  display: none;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-">🗺 Vue globale</button>
+
 
 <!-- NAV OVERLAY -->
 <div class="nav-overlay" id="navOverlay">
@@ -925,9 +909,52 @@ function showPopup(inv, marker) {
 function focusInvader(id) {
   const inv = allInvaders.find(i => i.id === id);
   if (!inv) return;
-  map.setView([inv.lat, inv.lng], 17, { animate: true });
+
+  // Centre la carte sur l'invader sans filtrer les autres
+  map.setView([inv.lat, inv.lng], 16, { animate: true });
+
+  // Ouvre la popup
   if (markers[id]) showPopup(inv, markers[id]);
-  showResetBtn();
+
+  // Fait clignoter le marqueur
+  pulseMarker(id);
+}
+
+function pulseMarker(id) {
+  const inv = allInvaders.find(i => i.id === id);
+  if (!inv) return;
+
+  const isFlashed = flashed.has(inv.id);
+  const baseColor = isFlashed ? '#aaaacc' :
+    inv.status === 'destroyed' ? '#ee1144' :
+    inv.status === 'damaged' ? '#ff9900' : '#00cc66';
+
+  let big = true;
+  let count = 0;
+  const interval = setInterval(() => {
+    const size = big ? 22 : 12;
+    const icon = L.divIcon({
+      html: `<div style="
+        width:${size}px; height:${size}px;
+        border-radius: 50%;
+        background: ${baseColor};
+        border: 3px solid #fff;
+        box-shadow: 0 0 ${big ? 16 : 8}px ${baseColor};
+        transition: all 0.2s;
+        margin-top: ${big ? -5 : 0}px;
+        margin-left: ${big ? -5 : 0}px;
+      "></div>`,
+      className: '', iconSize: [size, size], iconAnchor: [size/2, size/2]
+    });
+    if (markers[id]) markers[id].setIcon(icon);
+    big = !big;
+    count++;
+    if (count >= 6) {
+      clearInterval(interval);
+      // Remet le marqueur normal
+      renderMarkers();
+    }
+  }, 350);
 }
 
 // ===== FILTERING =====
@@ -1469,7 +1496,7 @@ function closeSidebar() {
 function bottomNav(tab) {
   document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('bn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  if (tab === 'map') { closeSidebar(); resetMapView(); return; }
+  if (tab === 'map') { closeSidebar(); return; }
   openSidebar();
   const tabs = document.querySelectorAll('.mode-tab');
   if (tab === 'balade') {
@@ -1500,27 +1527,10 @@ function closeWelcome() {
 // ===== VUE GLOBALE =====
 const PARIS_BOUNDS = [[48.78, 2.22], [48.93, 2.47]];
 
-function resetMapView() {
-  // Vide la recherche
-  document.getElementById('searchInput').value = '';
-  searchTerm = '';
-  // Remet le filtre sur "Tous"
-  currentFilter = 'all';
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-  const allBtn = document.querySelector('[data-filter="all"]');
-  if (allBtn) allBtn.classList.add('active');
-  // Réaffiche tous les marqueurs
-  renderAll();
-  // Recentre sur Paris
-  map.fitBounds(PARIS_BOUNDS, { animate: true });
-  document.getElementById('resetViewBtn').style.display = 'none';
-  if (isMobile()) closeSidebar();
-}
+
 
 // Affiche le bouton "Vue globale" dès qu'on zoome sur un invader
-function showResetBtn() {
-  document.getElementById('resetViewBtn').style.display = 'block';
-}
+
 
 // ===== GÉOLOCALISATION =====
 function requestGeolocation(callback) {

@@ -131,6 +131,7 @@ header {
 .balade-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; min-width: 60px; }
 .range-input { flex: 1; accent-color: var(--accent); cursor: pointer; }
 .range-value { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); min-width: 40px; text-align: right; }
+select.search-box { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555570'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
 .balade-summary { padding: 10px 14px; background: rgba(0,255,136,0.04); border-bottom: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); display: none; }
 .balade-summary.visible { display: block; }
 .balade-summary strong { color: var(--accent); }
@@ -476,9 +477,63 @@ header {
           <input type="range" class="range-input" id="baladeMax" min="3" max="30" step="1" value="10" oninput="updateBaladeMax()">
           <span class="range-value" id="baladeMaxVal">10</span>
         </div>
-        <div style="display:flex; gap:6px; margin-top:4px;">
-          <button class="btn" style="width:100%; font-size:12px;" onclick="planifierBalade()">📍 Planifier autour de ma position</button>
+
+        <!-- Bouton Ma position -->
+        <button class="btn" style="width:100%; font-size:12px; margin-top:4px;" onclick="planifierBalade()">📍 Ma position</button>
+
+        <!-- Séparateur -->
+        <div style="display:flex; align-items:center; gap:8px; margin:2px 0;">
+          <div style="flex:1; height:1px; background:var(--border);"></div>
+          <span style="font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">ou</span>
+          <div style="flex:1; height:1px; background:var(--border);"></div>
         </div>
+
+        <!-- Depuis un flash -->
+        <div style="display:flex; gap:6px;">
+          <input type="text" class="search-box" id="baladeFlashInput" placeholder="Depuis un flash (ex: PA_1529)" style="flex:1; font-size:11px; padding:7px 10px;">
+          <button class="btn gray" onclick="planifierDepuisFlash()" style="font-size:11px; white-space:nowrap;">Go</button>
+        </div>
+
+        <!-- Depuis une station -->
+        <select id="baladeStationSelect" class="search-box" style="font-size:11px; padding:7px 10px; cursor:pointer;" onchange="planifierDepuisStation()">
+          <option value="">🚇 Depuis une station de métro…</option>
+          <optgroup label="Rive Droite">
+            <option value="48.8730,2.3553">Gare du Nord</option>
+            <option value="48.8764,2.3592">Gare de l'Est</option>
+            <option value="48.8610,2.3477">Châtelet - Les Halles</option>
+            <option value="48.8637,2.3615">République</option>
+            <option value="48.8573,2.3498">Hôtel de Ville</option>
+            <option value="48.8590,2.3800">Bastille</option>
+            <option value="48.8783,2.3564">Stalingrad</option>
+            <option value="48.8842,2.3831">Belleville</option>
+            <option value="48.8654,2.3836">Oberkampf</option>
+            <option value="48.8720,2.3310">Pigalle</option>
+            <option value="48.8839,2.3429">Montmartre - Abbesses</option>
+            <option value="48.8738,2.2950">Place de Clichy</option>
+            <option value="48.8742,2.3070">Rome</option>
+            <option value="48.8656,2.3289">Opéra</option>
+            <option value="48.8727,2.3050">Monceau</option>
+          </optgroup>
+          <optgroup label="Rive Gauche">
+            <option value="48.8448,2.3723">Nation</option>
+            <option value="48.8506,2.3522">Denfert-Rochereau</option>
+            <option value="48.8422,2.3219">Montparnasse</option>
+            <option value="48.8462,2.3063">Vaugirard</option>
+            <option value="48.8532,2.3287">Saint-Germain-des-Prés</option>
+            <option value="48.8520,2.3437">Odéon</option>
+            <option value="48.8462,2.3063">Cambronne</option>
+            <option value="48.8568,2.3050">Invalides</option>
+            <option value="48.8583,2.2945">Trocadéro</option>
+            <option value="48.8588,2.2940">Bir-Hakeim</option>
+          </optgroup>
+          <optgroup label="Grands axes">
+            <option value="48.8738,2.2950">Étoile - Charles de Gaulle</option>
+            <option value="48.8663,2.3099">Champs-Élysées Clemenceau</option>
+            <option value="48.8648,2.3271">Concorde</option>
+            <option value="48.8690,2.3079">Franklin D. Roosevelt</option>
+            <option value="48.8603,2.3478">Louvre - Rivoli</option>
+          </optgroup>
+        </select>
       </div>
       <div class="balade-summary" id="baladeSummary"></div>
       <div class="balade-list" id="baladeList"></div>
@@ -1581,6 +1636,43 @@ function showGeoHelp() {
     </div>
   `;
   document.body.appendChild(el);
+}
+
+// ===== BALADE DEPUIS UN FLASH =====
+function planifierDepuisFlash() {
+  const input = document.getElementById('baladeFlashInput').value.trim().toUpperCase();
+  if (!input) { notify('Entre un ID de flash (ex: PA_1529)', true); return; }
+  const inv = allInvaders.find(i => i.id === input);
+  if (!inv) { notify('Flash ' + input + ' introuvable', true); return; }
+  const origin = { lat: inv.lat, lng: inv.lng };
+  baladeOrigin = origin;
+  const route = optimizeRoute(origin, allInvaders);
+  baladeRoute = route;
+  drawBalade(origin, route);
+  renderBaladeList(origin, route);
+  map.setView([origin.lat, origin.lng], 15, { animate: true });
+  if (isMobile()) closeSidebar();
+  notify('Balade depuis ' + input + ' : ' + route.length + ' invaders !');
+}
+
+// ===== BALADE DEPUIS UNE STATION =====
+function planifierDepuisStation() {
+  const select = document.getElementById('baladeStationSelect');
+  const val = select.value;
+  if (!val) return;
+  const [lat, lng] = val.split(',').map(Number);
+  const name = select.options[select.selectedIndex].text;
+  const origin = { lat, lng };
+  baladeOrigin = origin;
+  const route = optimizeRoute(origin, allInvaders);
+  baladeRoute = route;
+  drawBalade(origin, route);
+  renderBaladeList(origin, route);
+  map.setView([lat, lng], 15, { animate: true });
+  if (isMobile()) closeSidebar();
+  notify('Balade depuis ' + name + ' : ' + route.length + ' invaders !');
+  // Reset select
+  select.value = '';
 }
 
 // ===== START =====

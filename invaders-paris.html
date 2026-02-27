@@ -1501,6 +1501,17 @@ function closeWelcome() {
 const PARIS_BOUNDS = [[48.78, 2.22], [48.93, 2.47]];
 
 function resetMapView() {
+  // Vide la recherche
+  document.getElementById('searchInput').value = '';
+  searchTerm = '';
+  // Remet le filtre sur "Tous"
+  currentFilter = 'all';
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  const allBtn = document.querySelector('[data-filter="all"]');
+  if (allBtn) allBtn.classList.add('active');
+  // Réaffiche tous les marqueurs
+  renderAll();
+  // Recentre sur Paris
   map.fitBounds(PARIS_BOUNDS, { animate: true });
   document.getElementById('resetViewBtn').style.display = 'none';
   if (isMobile()) closeSidebar();

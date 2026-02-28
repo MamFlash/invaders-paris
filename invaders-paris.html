@@ -271,7 +271,7 @@ select.search-box { appearance: none; -webkit-appearance: none; background-image
 
 /* BOTTOM NAV — desktop: caché */
 .bottom-nav { display: none; }
-.sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2999; pointer-events: auto; }
+
 
 /* ===================== MOBILE ===================== */
 @media (max-width: 768px) {
@@ -564,9 +564,6 @@ select.search-box { appearance: none; -webkit-appearance: none; background-image
     <span class="nav-icon">⭐</span><span>Restants</span>
   </button>
 </nav>
-
-<!-- BACKDROP -->
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
 
 
@@ -1506,8 +1503,6 @@ function resetBalade() {
   const inp = document.getElementById('baladeFlashInput');
   if (inp) inp.value = '';
   stopNavigation();
-  // S'assurer que le tiroir et le backdrop sont bien fermés
-  closeSidebar();
 }
 
 function showCancelBaladeBtn() {
@@ -1608,19 +1603,10 @@ function stopNavigation() {
 function isMobile() { return window.innerWidth <= 768; }
 
 function openSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const backdrop = document.getElementById('sidebarBackdrop');
-  sidebar.classList.add('open');
-  backdrop.style.display = 'block';
-  // Empêche le scroll du body pendant que le tiroir est ouvert
-  document.body.style.overflow = 'hidden';
+  document.getElementById('sidebar').classList.add('open');
 }
 function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const backdrop = document.getElementById('sidebarBackdrop');
-  sidebar.classList.remove('open');
-  backdrop.style.display = 'none';
-  document.body.style.overflow = '';
+  document.getElementById('sidebar').classList.remove('open');
   document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('bnMap').classList.add('active');
 }

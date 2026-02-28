@@ -306,12 +306,12 @@ select.search-box { appearance: none; -webkit-appearance: none; background-image
     border-radius: 18px 18px 0 0;
     border-right: none;
     border-top: 2px solid var(--border);
-    transform: translateY(120%) !important;
+    transform: translateY(120%);
     transition: transform 0.3s ease-out;
     z-index: 3000;
     overflow: hidden;
   }
-  .sidebar.open { transform: translateY(0); }
+  .sidebar.open { transform: translateY(0) !important; }
 
   /* Poignée en haut du tiroir */
   .sidebar::before {

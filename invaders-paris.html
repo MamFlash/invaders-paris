@@ -271,8 +271,7 @@ select.search-box { appearance: none; -webkit-appearance: none; background-image
 
 /* BOTTOM NAV — desktop: caché */
 .bottom-nav { display: none; }
-.sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2999; }
-.sidebar-backdrop.visible { display: block; }
+.sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2999; pointer-events: auto; }
 
 /* ===================== MOBILE ===================== */
 @media (max-width: 768px) {
@@ -296,17 +295,19 @@ select.search-box { appearance: none; -webkit-appearance: none; background-image
   /* Sidebar = tiroir depuis le bas */
   .sidebar {
     position: fixed !important;
-    left: 0; right: 0;
-    bottom: var(--bottom-nav-h);
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 60px !important;
     top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: 75dvh;
+    height: 70svh !important;
+    max-height: calc(100svh - 120px) !important;
     border-radius: 18px 18px 0 0;
     border-right: none;
     border-top: 2px solid var(--border);
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(120%) !important;
+    transition: transform 0.3s ease-out;
     z-index: 3000;
     overflow: hidden;
   }
@@ -1505,6 +1506,8 @@ function resetBalade() {
   const inp = document.getElementById('baladeFlashInput');
   if (inp) inp.value = '';
   stopNavigation();
+  // S'assurer que le tiroir et le backdrop sont bien fermés
+  closeSidebar();
 }
 
 function showCancelBaladeBtn() {
@@ -1605,12 +1608,19 @@ function stopNavigation() {
 function isMobile() { return window.innerWidth <= 768; }
 
 function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarBackdrop').classList.add('visible');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  sidebar.classList.add('open');
+  backdrop.style.display = 'block';
+  // Empêche le scroll du body pendant que le tiroir est ouvert
+  document.body.style.overflow = 'hidden';
 }
 function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('visible');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  sidebar.classList.remove('open');
+  backdrop.style.display = 'none';
+  document.body.style.overflow = '';
   document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('bnMap').classList.add('active');
 }

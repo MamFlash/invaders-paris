@@ -44,6 +44,14 @@ header {
 .stat-value.yellow { color: var(--accent3); }
 .stat-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
+
+/* AUTH */
+.auth-btn { display:flex; align-items:center; gap:6px; margin-left:16px; padding:6px 12px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text, #eee); font-family:'Syne',sans-serif; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap; }
+.auth-btn:hover { border-color: var(--accent); }
+.auth-btn img { width:22px; height:22px; border-radius:50%; }
+.auth-btn.logged { border-color: var(--accent); }
+@media (max-width: 768px) { .auth-btn { margin-left:8px; padding:4px 8px; font-size:11px; } .auth-btn .auth-label { display:none; } .auth-btn:not(.logged) .auth-label { display:inline; } }
+
 /* MAIN */
 .main { display: flex; flex: 1; overflow: hidden; }
 
@@ -422,6 +430,7 @@ select.search-box { appearance: none; -webkit-appearance: none; background-image
     <div class="stat"><span class="stat-value" id="statRemaining">0</span><span class="stat-label">Restants</span></div>
     <div class="stat"><span class="stat-value red" id="statDestroyed">0</span><span class="stat-label">Détruits</span></div>
   </div>
+  <button class="auth-btn" id="authBtn" onclick="authToggle()">🔐 <span class="auth-label">Connexion</span></button>
 </header>
 
 <div class="main">
@@ -1112,6 +1121,7 @@ function toggleFlash(event, id) {
 function saveFlashed() {
   localStorage.setItem('flashedInvaders', JSON.stringify([...flashed]));
   updateStats();
+  if (window.cloudSave) window.cloudSave([...flashed]);
 }
 
 // ===== STATS =====
@@ -1756,5 +1766,115 @@ function planifierDepuisStation() {
 // ===== START =====
 init();
 </script>
+
+<!-- ===== COMPTE GOOGLE + SYNCHRO (Firebase) ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// Config Firebase du projet invaders-paris
+const firebaseConfig = {
+  apiKey: "AIzaSyCX3krdx6F3xDUTokt4cPaheMMvvVtSnwY",
+  authDomain: "invaders-paris-4c019.firebaseapp.com",
+  projectId: "invaders-paris-4c019",
+  storageBucket: "invaders-paris-4c019.firebasestorage.app",
+  messagingSenderId: "35063094922",
+  appId: "1:35063094922:web:b66dcb33b16d4f59555773"
+};
+
+const configured = !firebaseConfig.apiKey.startsWith("COLLE");
+let auth, db, user = null, unsub = null, applyingRemote = false;
+
+const btn = () => document.getElementById('authBtn');
+
+function renderBtn() {
+  const b = btn(); if (!b) return;
+  if (user) {
+    b.classList.add('logged');
+    const name = (user.displayName || user.email || '').split(' ')[0];
+    b.innerHTML = (user.photoURL ? `<img src="${user.photoURL}" referrerpolicy="no-referrer" alt="">` : '👤')
+                + `<span class="auth-label">${name}</span>`;
+  } else {
+    b.classList.remove('logged');
+    b.innerHTML = '🔐 <span class="auth-label">Connexion</span>';
+  }
+}
+
+function logoutModal() {
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  o.innerHTML = `
+    <div style="background:#111118;border:1px solid #00ff88;border-radius:14px;padding:24px;max-width:320px;width:100%;font-family:'Syne',sans-serif;text-align:center;">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;">Connecté</div>
+      <div style="font-size:12px;color:#888;margin-bottom:6px;word-break:break-all;">${user.email || ''}</div>
+      <div style="font-size:11px;color:#666;margin-bottom:20px;">Tes flashs sont synchronisés entre tes appareils.</div>
+      <div style="display:flex;gap:10px;">
+        <button id="authClose" style="flex:1;padding:10px;border-radius:8px;border:1px solid #444;background:transparent;color:#aaa;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Fermer</button>
+        <button id="authOut" style="flex:1;padding:10px;border-radius:8px;border:none;background:#ff3366;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Déconnexion</button>
+      </div>
+    </div>`;
+  document.body.appendChild(o);
+  o.querySelector('#authClose').onclick = () => o.remove();
+  o.querySelector('#authOut').onclick = async () => { o.remove(); await signOut(auth); notify('Déconnecté'); };
+}
+
+window.authToggle = async function () {
+  if (!configured) { notify('Connexion pas encore configurée (voir config Firebase)', true); return; }
+  if (user) { logoutModal(); return; }
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+      signInWithRedirect(auth, provider);
+    } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+      console.error(e); notify('Connexion impossible : ' + (e.code || e.message), true);
+    }
+  }
+};
+
+window.cloudSave = function (arr) {
+  if (!user || applyingRemote) return;
+  setDoc(doc(db, 'users', user.uid), { flashed: arr, updatedAt: Date.now() })
+    .catch(e => { console.error(e); notify('Synchro impossible', true); });
+};
+
+if (configured) {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+
+  onAuthStateChanged(auth, u => {
+    user = u; renderBtn();
+    if (unsub) { unsub(); unsub = null; }
+    if (!u) return;
+
+    let first = true;
+    unsub = onSnapshot(doc(db, 'users', u.uid), snap => {
+      const remote = snap.exists() ? (snap.data().flashed || []) : [];
+      if (first) {
+        // 1ère synchro : on fusionne les flashs de cet appareil avec ceux du compte
+        first = false;
+        remote.forEach(id => flashed.add(id));
+        saveFlashed();            // sauvegarde locale + envoi au cloud
+        renderAll();
+        notify(`✅ Connecté — ${flashed.size} flashs synchronisés`);
+      } else if (!snap.metadata.hasPendingWrites) {
+        // Modification venue d'un autre appareil
+        applyingRemote = true;
+        flashed.clear(); remote.forEach(id => flashed.add(id));
+        saveFlashed();
+        renderAll();
+        applyingRemote = false;
+      }
+    }, err => { console.error(err); notify('Synchro impossible', true); });
+  });
+}
+renderBtn();
+</script>
+
 </body>
 </html>

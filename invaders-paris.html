@@ -731,12 +731,15 @@ async function loadData() {
     if (r.ok) { imageMap = await r.json(); console.log(`📸 ${Object.keys(imageMap).length} photos chargées`); }
   } catch(e) {}
 
-  // Strategy 1: local file in same folder (best — no CORS)
-  let data = await tryLoadLocal();
-
-  if (!data || data.length === 0) {
-    setProgress(30, 'Fichier local non trouvé — tentative pnote.eu…');
-    data = await tryLoadPnote();
+  // Charge le fichier local ET la source en ligne, puis fusionne (la source en ligne, plus récente, l'emporte)
+  const [localData, liveData] = await Promise.all([tryLoadLocal(), tryLoadPnote()]);
+  let data = null;
+  if (localData || liveData) {
+    const byId = new Map();
+    (localData || []).forEach(d => byId.set(d.id, d));
+    (liveData || []).forEach(d => byId.set(d.id, d));
+    data = [...byId.values()];
+    console.log(`📦 local: ${localData ? localData.length : 0} · en ligne: ${liveData ? liveData.length : 0} · fusion: ${data.length}`);
   }
 
   if (!data || data.length === 0) {

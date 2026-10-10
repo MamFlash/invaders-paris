@@ -736,6 +736,7 @@ async function loadData() {
   let data = null;
   if (localData || liveData) {
     const byId = new Map();
+    window.localCount = localData ? localData.length : 0;
     (localData || []).forEach(d => byId.set(d.id, d));
     (liveData || []).forEach(d => byId.set(d.id, d));
     data = [...byId.values()];
@@ -757,6 +758,8 @@ async function loadData() {
   setTimeout(() => {
     document.getElementById('loadingOverlay').style.display = 'none';
     showWelcomeIfFirstTime();
+    notify(`Données : fichier local ${window.localCount || 0} · en ligne : ${window.pnoteStatus || 'non essayé'} · total ${allInvaders.length}`);
+    clearTimeout(notifTimer); notifTimer = setTimeout(() => document.getElementById('notif').className = 'notif', 15000);
   }, 400);
 }
 
@@ -780,12 +783,13 @@ async function tryLoadPnote() {
   const url = `https://pnote.eu/projects/invaders/map/invaders.json?nocache=${Date.now()}`;
   try {
     const r = await fetch(url, { mode: 'cors', signal: AbortSignal.timeout(10000) });
-    if (r.ok) {
-      const json = await r.json();
-      const parsed = parsePnoteData(json);
-      if (parsed.length > 0) return parsed;
-    }
-  } catch(e) { /* CORS blocked */ }
+    if (!r.ok) { window.pnoteStatus = `erreur HTTP ${r.status}`; return null; }
+    const json = await r.json();
+    const parsed = parsePnoteData(json);
+    const rawPA = Array.isArray(json) ? json.filter(d => d.id && d.id.startsWith('PA_')).length : 0;
+    window.pnoteStatus = `${rawPA} PA_ reçus, ${parsed.length} avec coordonnées`;
+    if (parsed.length > 0) return parsed;
+  } catch(e) { window.pnoteStatus = 'bloqué par le navigateur (' + (e.name || 'erreur') + ')'; }
   return null;
 }
 
